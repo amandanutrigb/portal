@@ -586,6 +586,7 @@ var LINHA = [
 
 (function(){
   var fmt = function(n){ return typeof n === "number" ? String(n).replace(".", ",") : n; };
+  var dec = function(n, d){ return (+n).toFixed(d).replace(".", ","); };
   var el  = function(id){ return document.getElementById(id); };
 
   /* ---------- HERO: números da última avaliação ---------- */
@@ -594,9 +595,9 @@ var LINHA = [
   var imc = last.peso / (alturaM * alturaM);
   var dPeso = last.peso - first.peso;
   el("stats").innerHTML =
-    stat(fmt(+last.peso.toFixed(1)), "Peso kg", dPeso) +
-    stat(imc.toFixed(1).replace(".", ","), "IMC", null) +
-    stat(fmt(last.gordura) + "%", "Gordura", last.gordura - first.gordura) +
+    stat(dec(last.peso, 1), "Peso kg", dPeso) +
+    stat(dec(imc, 1), "IMC", null) +
+    stat(dec(last.gordura, 1) + "%", "Gordura", last.gordura - first.gordura) +
     stat("12/08", "Retorno", null);
 
   function stat(valor, rot, delta){
@@ -618,8 +619,8 @@ var LINHA = [
 
   /* ---------- TABELA DE MEDIDAS ---------- */
   var linhas = [
-    ["Peso", "peso", " kg"], ["Gordura", "gordura", " %"],
-    ["Massa magra", "magra", " kg"], ["Cintura", "cintura", " cm"]
+    ["Peso", "peso", " kg", 1], ["Gordura", "gordura", " %", 1],
+    ["Massa magra", "magra", " kg", 1], ["Cintura", "cintura", " cm", 0]
   ];
   el("tblAntro").innerHTML =
     "<thead><tr><th>Medida</th>" + ANTRO.map(function(a){ return "<th>" + a.data + "</th>"; }).join("") +
@@ -627,9 +628,9 @@ var LINHA = [
     linhas.map(function(l){
       var ini = first[l[1]], fim = last[l[1]], dif = +(fim - ini).toFixed(1);
       return "<tr><td>" + l[0] + "</td>" +
-        ANTRO.map(function(a){ return '<td class="num">' + fmt(a[l[1]]) + l[2] + "</td>"; }).join("") +
+        ANTRO.map(function(a){ return '<td class="num">' + dec(a[l[1]], l[3]) + l[2] + "</td>"; }).join("") +
         '<td class="num"><span class="tag ' + (dif < 0 ? "t-ok" : dif > 0 ? "t-att" : "t-ok") + '">' +
-        (dif > 0 ? "+" : "") + fmt(dif) + "</span></td></tr>";
+        (dif > 0 ? "+" : "") + dec(dif, 1) + "</span></td></tr>";
     }).join("") + "</tbody>";
 
   /* ---------- TABELA DE EXAMES ---------- */
@@ -647,10 +648,10 @@ var LINHA = [
 
   /* ---------- GRÁFICO ---------- */
   var series = [
-    { k:"peso",    rot:"Peso (kg)",      un:" kg" },
-    { k:"gordura", rot:"Gordura (%)",    un:" %"  },
-    { k:"cintura", rot:"Cintura (cm)",   un:" cm" },
-    { k:"magra",   rot:"Massa magra (kg)", un:" kg" }
+    { k:"peso",    rot:"Peso (kg)",        un:" kg", d:1 },
+    { k:"gordura", rot:"Gordura (%)",      un:" %",  d:1 },
+    { k:"cintura", rot:"Cintura (cm)",     un:" cm", d:0 },
+    { k:"magra",   rot:"Massa magra (kg)", un:" kg", d:1 }
   ];
   var atual = 0;
 
@@ -690,7 +691,7 @@ var LINHA = [
     var dots = vals.map(function(v, i){
       return '<circle cx="' + x(i) + '" cy="' + y(v) + '" r="4" fill="#fffdfa" stroke="#a86b78" stroke-width="2.5"/>' +
              '<text x="' + x(i) + '" y="' + (y(v) - 10) + '" font-size="9.5" font-weight="700" fill="#5b3b42" text-anchor="middle">' +
-             String(v).replace(".", ",") + "</text>" +
+             dec(v, s.d) + "</text>" +
              '<text x="' + x(i) + '" y="' + (H - B + 15) + '" font-size="8.5" fill="#a89490" text-anchor="middle">' +
              ANTRO[i].data.slice(0, 5) + "</text>";
     }).join("");
@@ -705,10 +706,10 @@ var LINHA = [
 
     var ini = vals[0], fim = vals[vals.length - 1], dif = +(fim - ini).toFixed(1);
     el("legend").innerHTML =
-      "<span>Início <b>" + fmt(ini) + s.un + "</b></span>" +
+      "<span>Início <b>" + dec(ini, s.d) + s.un + "</b></span>" +
       '<span style="color:' + (dif < 0 ? "#4f7d57" : "#b45f63") + '">' +
-      (dif > 0 ? "+" : "") + fmt(dif) + s.un + "</span>" +
-      "<span>Agora <b>" + fmt(fim) + s.un + "</b></span>";
+      (dif > 0 ? "+" : "") + dec(dif, 1) + s.un + "</span>" +
+      "<span>Agora <b>" + dec(fim, s.d) + s.un + "</b></span>";
   }
   desenha();
 
