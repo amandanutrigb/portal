@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Portal · Paciente Teste</title>
+<meta name="theme-color" content="#3f5544">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meu Portal">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233f5544'/%3E%3Cpath d='M32 48c0-14 6-22 16-24-2 12-8 20-16 24z' fill='%23c9d8bf'/%3E%3Cpath d='M32 48C24 44 18 36 16 24c10 2 16 10 16 24z' fill='%23e8efe2'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#222b24; --ink-soft:#5b6a5f; --ink-faint:#8a978d;
+    --bg:#f7f5f0; --card:#ffffff; --line:#e4e2da;
+    --brand:#3f5544; --brand-2:#5d7a62; --sage:#c9d8bf; --sage-soft:#eef3ea;
+    --warn:#b4762a; --warn-bg:#fdf3e4; --alert:#a4472f; --alert-bg:#fbeceA;
+    --ok:#3f6b4c; --ok-bg:#eaf3ec;
+    --hero-h:150px;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+
+  /* ============ HERO FIXO ============ */
+  .hero{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    background:linear-gradient(150deg,#43594a 0%,#334539 60%,#2b3a30 100%);
+    color:#fff;padding:calc(env(safe-area-inset-top) + 16px) 20px 14px;
+    box-shadow:0 2px 18px rgba(34,43,36,.18);
+  }
+  .hero-top{display:flex;align-items:center;gap:13px}
+  .avatar{
+    width:52px;height:52px;flex:0 0 52px;border-radius:50%;
+    background:var(--sage);color:var(--brand);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:.5px;
+  }
+  .hero h1{font-family:var(--serif);font-size:21px;line-height:1.2;margin:0 0 3px;font-weight:600}
+  .hero .sub{font-size:12.5px;color:#c3d2c6;letter-spacing:.02em}
+  .hero-stats{display:flex;gap:6px;margin-top:12px}
+  .stat{
+    flex:1;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;padding:7px 4px;text-align:center;min-width:0;
+  }
+  .stat b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;line-height:1.25}
+  .stat span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:#adc0b1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ============ NAV ============ */
+  nav{
+    position:fixed;top:var(--hero-h);left:0;right:0;z-index:49;
+    background:rgba(247,245,240,.94);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;scrollbar-width:none;
+  }
+  nav::-webkit-scrollbar{display:none}
+  .nav-inner{display:flex;gap:6px;padding:9px 16px}
+  nav a{
+    flex:0 0 auto;text-decoration:none;font-size:12.5px;font-weight:500;
+    color:var(--ink-soft);background:#fff;border:1px solid var(--line);
+    padding:5px 12px;border-radius:20px;transition:.18s;
+  }
+  nav a.on{background:var(--brand);border-color:var(--brand);color:#fff}
+
+  /* ============ LAYOUT ============ */
+  main{padding:calc(var(--hero-h) + 62px) 16px 90px;max-width:720px;margin:0 auto}
+  section{scroll-margin-top:calc(var(--hero-h) + 64px);margin-bottom:26px}
+  .sec-head{display:flex;align-items:baseline;gap:9px;margin:0 2px 11px}
+  .sec-head h2{font-family:var(--serif);font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+  .sec-head .n{font-size:10px;font-weight:700;color:var(--brand-2);letter-spacing:.12em;background:var(--sage-soft);padding:3px 7px;border-radius:5px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:17px 18px;box-shadow:0 1px 2px rgba(34,43,36,.04);
+  }
+  .card + .card{margin-top:10px}
+  .card h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--brand-2);margin:0 0 9px}
+  .card p{margin:0 0 10px}
+  .card p:last-child{margin-bottom:0}
+  .muted{color:var(--ink-soft);font-size:14.5px}
+
+  /* dados em pares */
+  .kv{display:grid;grid-template-columns:1fr;gap:0}
+  .kv div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .kv div:last-child{border-bottom:0}
+  .kv dt,.kv .k{color:var(--ink-faint);flex:0 0 auto}
+  .kv .v{text-align:right;font-weight:500}
+
+  ul.tick{list-style:none;padding:0;margin:0}
+  ul.tick li{position:relative;padding:7px 0 7px 24px;font-size:15px;border-bottom:1px dashed var(--line)}
+  ul.tick li:last-child{border-bottom:0}
+  ul.tick li::before{
+    content:"";position:absolute;left:4px;top:15px;width:7px;height:7px;
+    border-radius:50%;background:var(--sage);border:2px solid var(--brand-2);
+  }
+
+  /* tabela */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);font-weight:700;padding:0 6px 8px 0;border-bottom:1px solid var(--line)}
+  td{padding:10px 6px 10px 0;border-bottom:1px dashed var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td:first-child{font-weight:500}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;letter-spacing:.02em}
+  .t-ok{background:var(--ok-bg);color:var(--ok)}
+  .t-att{background:var(--warn-bg);color:var(--warn)}
+  .t-alt{background:var(--alert-bg);color:var(--alert)}
+
+  /* acordeão */
+  details{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:8px;overflow:hidden}
+  details[open]{border-color:var(--sage)}
+  summary{
+    cursor:pointer;list-style:none;padding:13px 16px;font-weight:600;font-size:15px;
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-family:var(--serif);font-size:20px;color:var(--brand-2);line-height:1}
+  details[open] summary{border-bottom:1px solid var(--line);background:var(--sage-soft)}
+  details[open] summary::after{content:"–"}
+  .det-body{padding:14px 16px}
+  .meal-time{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--brand-2);text-transform:uppercase}
+
+  /* destaque / conduta */
+  .highlight{background:var(--sage-soft);border:1px solid var(--sage);border-left:4px solid var(--brand-2)}
+  .pdf{
+    display:flex;align-items:center;gap:13px;text-decoration:none;color:inherit;
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  }
+  .pdf-ic{
+    flex:0 0 40px;height:40px;border-radius:9px;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;letter-spacing:.05em;
+  }
+  .pdf b{display:block;font-size:15px}
+  .pdf span{font-size:12px;color:var(--ink-faint)}
+
+  .note{font-size:13px;color:var(--ink-faint);font-style:italic;margin-top:9px}
+  footer{text-align:center;padding:26px 16px 40px;color:var(--ink-faint);font-size:12px;border-top:1px solid var(--line);margin-top:34px}
+  footer b{font-family:var(--serif);color:var(--brand);font-size:14px;display:block;margin-bottom:4px;font-weight:600}
+
+  #install{
+    position:fixed;bottom:16px;left:16px;right:16px;z-index:60;display:none;
+    background:var(--brand);color:#fff;border:0;border-radius:12px;padding:14px;
+    font-size:14px;font-weight:600;font-family:var(--sans);
+    box-shadow:0 6px 24px rgba(34,43,36,.28);cursor:pointer;
+  }
+
+  @media(min-width:640px){
+    :root{--hero-h:158px}
+    main{padding-left:24px;padding-right:24px}
+    .kv{grid-template-columns:1fr 1fr;gap:0 28px}
+    .hero h1{font-size:24px}
+  }
+  @media print{
+    .hero{position:static}nav,#install{display:none}
+    main{padding:16px}details{break-inside:avoid}details:not([open]) .det-body{display:block}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO FIXO ===================== -->
+<header class="hero" id="hero">
+  <div class="hero-top">
+    <div class="avatar">MT</div>
+    <div style="min-width:0">
+      <h1>Maria Teste</h1>
+      <div class="sub">34 anos · Emagrecimento e saúde metabólica</div>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><b>78,4</b><span>Peso kg</span></div>
+    <div class="stat"><b>28,7</b><span>IMC</span></div>
+    <div class="stat"><b>32%</b><span>Gordura</span></div>
+    <div class="stat"><b>12/08</b><span>Retorno</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#anamnese">Anamnese</a>
+    <a href="#exames">Exames</a>
+    <a href="#consulta">Consulta</a>
+    <a href="#conduta">Conduta</a>
+    <a href="#dieta">Dieta</a>
+    <a href="#suplementos">Suplementos</a>
+    <a href="#clinica">Clínica</a>
+    <a href="#evolucao">Evolução</a>
+    <a href="#orientacoes">Orientações</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===================== ANAMNESE ===================== -->
+<section id="anamnese">
+  <div class="sec-head"><span class="n">01</span><h2>Anamnese</h2></div>
+
+  <div class="card">
+    <h3>Identificação</h3>
+    <div class="kv">
+      <div><span class="k">Nascimento</span><span class="v">14/03/1992</span></div>
+      <div><span class="k">Profissão</span><span class="v">Advogada</span></div>
+      <div><span class="k">1ª consulta</span><span class="v">15/07/2026</span></div>
+      <div><span class="k">Altura</span><span class="v">1,65 m</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Queixa principal e objetivo</h3>
+    <p>Ganho de 9 kg nos últimos 2 anos, cansaço no meio da tarde e compulsão por doce à noite. Objetivo: perder gordura sem dieta restritiva e melhorar energia.</p>
+  </div>
+
+  <div class="card">
+    <h3>História clínica</h3>
+    <ul class="tick">
+      <li><b>Antecedentes:</b> resistência à insulina (2024), rinite alérgica</li>
+      <li><b>Cirurgias:</b> nenhuma</li>
+      <li><b>Medicações:</b> anticoncepcional oral contínuo</li>
+      <li><b>Alergias / intolerâncias:</b> desconforto com lactose</li>
+      <li><b>Familiar:</b> mãe com DM2, pai hipertenso</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Hábitos e rotina</h3>
+    <div class="kv">
+      <div><span class="k">Sono</span><span class="v">6 h, fragmentado</span></div>
+      <div><span class="k">Atividade física</span><span class="v">Musculação 2×/sem</span></div>
+      <div><span class="k">Água</span><span class="v">~1,2 L/dia</span></div>
+      <div><span class="k">Intestino</span><span class="v">A cada 2 dias</span></div>
+      <div><span class="k">Álcool</span><span class="v">Fins de semana</span></div>
+      <div><span class="k">Estresse</span><span class="v">Alto (7/10)</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Recordatório alimentar habitual</h3>
+    <ul class="tick">
+      <li><b>Manhã:</b> café preto, pão francês com requeijão</li>
+      <li><b>Almoço:</b> arroz, feijão, frango grelhado, pouca salada</li>
+      <li><b>Tarde:</b> café com açúcar + biscoito</li>
+      <li><b>Jantar:</b> repete o almoço ou pede delivery</li>
+      <li><b>Noite:</b> chocolate ou sorvete quase todos os dias</li>
+    </ul>
+    <p class="note">Sinais e sintomas relatados: distensão abdominal, unhas frágeis, queda de cabelo.</p>
+  </div>
+</section>
+
+<!-- ===================== EXAMES ===================== -->
+<section id="exames">
+  <div class="sec-head"><span class="n">02</span><h2>Exames</h2></div>
+
+  <div class="card">
+    <h3>Coleta de 08/07/2026</h3>
+    <table>
+      <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Glicemia de jejum</td><td>101 mg/dL</td><td>70–99</td><td><span class="tag t-att">Atenção</span></td></tr>
+        <tr><td>Insulina de jejum</td><td>18,2 µUI/mL</td><td>&lt; 10</td><td><span class="tag t-alt">Alterado</span></td></tr>
+        <tr><td>HOMA-IR</td><td>4,5</td><td>&lt; 2,5</td><td><span class="tag t-alt">Alterado</span></td></tr>
+        <tr><td>Hemoglobina glicada</td><td>5,7 %</td><td>&lt; 5,7</td><td><span class="tag t-att">Atenção</span></td></tr>
+        <tr><td>TSH</td><td>2,1 µUI/mL</td><td>0,4–4,0</td><td><span class="tag t-ok">Normal</span></td></tr>
+        <tr><td>Vitamina D (25-OH)</td><td>19 ng/mL</td><td>&gt; 30</td><td><span class="tag t-alt">Alterado</span></td></tr>
+        <tr><td>Vitamina B12</td><td>310 pg/mL</td><td>&gt; 400 (ideal)</td><td><span class="tag t-att">Atenção</span></td></tr>
+        <tr><td>Ferritina</td><td>22 ng/mL</td><td>&gt; 50 (ideal)</td><td><span class="tag t-att">Atenção</span></td></tr>
+        <tr><td>Hemoglobina</td><td>12,6 g/dL</td><td>12,0–15,5</td><td><span class="tag t-ok">Normal</span></td></tr>
+        <tr><td>Colesterol total</td><td>212 mg/dL</td><td>&lt; 190</td><td><span class="tag t-att">Atenção</span></td></tr>
+        <tr><td>HDL</td><td>44 mg/dL</td><td>&gt; 50</td><td><span class="tag t-att">Atenção</span></td></tr>
+        <tr><td>LDL</td><td>138 mg/dL</td><td>&lt; 130</td><td><span class="tag t-att">Atenção</span></td></tr>
+        <tr><td>Triglicerídeos</td><td>168 mg/dL</td><td>&lt; 150</td><td><span class="tag t-alt">Alterado</span></td></tr>
+        <tr><td>TGO / TGP</td><td>28 / 34 U/L</td><td>&lt; 35</td><td><span class="tag t-ok">Normal</span></td></tr>
+        <tr><td>PCR ultrassensível</td><td>3,8 mg/L</td><td>&lt; 1,0</td><td><span class="tag t-alt">Alterado</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card highlight">
+    <h3>Leitura dos exames</h3>
+    <p>O conjunto mostra <b>resistência à insulina em curso</b> (insulina e HOMA elevados, triglicerídeos altos, HDL baixo) com <b>inflamação leve</b> pela PCR. Não é diabetes — é o estágio anterior, e é reversível com alimentação e treino.</p>
+    <p>Somam-se três carências que explicam bem o cansaço e a queda de cabelo: <b>vitamina D baixa, B12 no limite e ferritina baixa</b>.</p>
+  </div>
+
+  <div class="card">
+    <h3>Exames solicitados para o retorno</h3>
+    <ul class="tick">
+      <li>Insulina, glicemia e HOMA-IR (repetir em 90 dias)</li>
+      <li>Vitamina D, B12 e ferritina (controle de reposição)</li>
+      <li>Perfil lipídico completo</li>
+      <li>Zinco e magnésio eritrocitário</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== CONSULTA ===================== -->
+<section id="consulta">
+  <div class="sec-head"><span class="n">03</span><h2>O que conversamos</h2></div>
+
+  <div class="card">
+    <h3>Consulta de 22/07/2026</h3>
+    <p>Conversamos que o problema principal <b>não é falta de força de vontade</b> — é a combinação de sono curto, café da manhã pobre em proteína e um intervalo grande sem comer à tarde. Isso derruba a energia e faz o doce da noite ser quase inevitável.</p>
+    <p>Definimos juntas que o foco dos próximos 30 dias é <b>proteína em todas as refeições, sono e hidratação</b>. Nada de contar caloria por enquanto.</p>
+    <p>Você trouxe a preocupação de não conseguir seguir dieta em jantar fora — combinamos duas estratégias práticas para isso (estão na conduta).</p>
+  </div>
+
+  <div class="card">
+    <h3>Combinados desta consulta</h3>
+    <ul class="tick">
+      <li>Registrar em foto as refeições por 7 dias</li>
+      <li>Dormir 7 h em pelo menos 5 noites da semana</li>
+      <li>Subir para 3 treinos semanais</li>
+      <li>Retorno em 21 dias com exames de controle</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== CONDUTA ===================== -->
+<section id="conduta">
+  <div class="sec-head"><span class="n">04</span><h2>Conduta</h2></div>
+
+  <div class="card highlight">
+    <h3>Prioridades dos próximos 30 dias</h3>
+    <ul class="tick">
+      <li><b>1.</b> 25–30 g de proteína no café da manhã, todos os dias</li>
+      <li><b>2.</b> Lanche da tarde planejado às 16 h — proteína + fruta</li>
+      <li><b>3.</b> 2,2 L de água por dia (garrafa de 750 ml, 3×)</li>
+      <li><b>4.</b> Caminhada de 15 min após o jantar</li>
+      <li><b>5.</b> Tela desligada 40 min antes de dormir</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Estratégias para comer fora</h3>
+    <ul class="tick">
+      <li>Escolher a proteína primeiro, depois o acompanhamento</li>
+      <li>Pedir salada ou legume de entrada, sempre</li>
+      <li>Bebida alcoólica: até 2 doses, alternando com água</li>
+      <li>Sobremesa: dividir, e só quando for algo que você realmente quer</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Encaminhamentos</h3>
+    <ul class="tick">
+      <li>Educador físico parceiro — ajuste do treino para 3×/semana</li>
+      <li>Retorno ao ginecologista para revisão do anticoncepcional</li>
+      <li>Reavaliação nutricional em 21 dias</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== DIETA ===================== -->
+<section id="dieta">
+  <div class="sec-head"><span class="n">05</span><h2>Plano alimentar</h2></div>
+
+  <a class="pdf" href="dieta.pdf" target="_blank" rel="noopener">
+    <span class="pdf-ic">PDF</span>
+    <span><b>Plano alimentar completo</b><span>Versão 22/07/2026 · toque para abrir</span></span>
+  </a>
+
+  <div class="card" style="margin-top:10px">
+    <h3>Resumo do plano</h3>
+    <p class="muted">Aproximadamente 1.700 kcal · 120 g de proteína · 3 refeições + 1 lanche. As substituições estão no PDF.</p>
+  </div>
+
+  <details>
+    <summary>Café da manhã <span class="meal-time">07h</span></summary>
+    <div class="det-body">
+      <ul class="tick">
+        <li>2 ovos mexidos + 1 fatia de queijo branco</li>
+        <li>1 fatia de pão integral <i>ou</i> 2 col. de tapioca</li>
+        <li>1 fruta (mamão, morango ou kiwi)</li>
+        <li>Café sem açúcar à vontade</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Almoço <span class="meal-time">12h30</span></summary>
+    <div class="det-body">
+      <ul class="tick">
+        <li>Salada crua à vontade + 1 col. de azeite</li>
+        <li>150 g de proteína (frango, peixe, carne magra ou ovos)</li>
+        <li>4 col. de arroz, batata ou mandioca</li>
+        <li>1 concha de feijão ou lentilha</li>
+        <li>Legume cozido à vontade</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Lanche da tarde <span class="meal-time">16h</span></summary>
+    <div class="det-body">
+      <ul class="tick">
+        <li>1 iogurte natural sem lactose <i>ou</i> 1 scoop de whey</li>
+        <li>1 fruta + 1 col. de pasta de amendoim</li>
+        <li>Opção prática: 30 g de castanhas + 1 fruta</li>
+      </ul>
+      <p class="note">Esta é a refeição mais importante do plano — é ela que segura o doce da noite.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Jantar <span class="meal-time">20h</span></summary>
+    <div class="det-body">
+      <ul class="tick">
+        <li>Salada ou legumes à vontade</li>
+        <li>150 g de proteína</li>
+        <li>2 col. de carboidrato (opcional em dia sem treino)</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Livre e flexibilidade</summary>
+    <div class="det-body">
+      <p>Uma refeição livre por semana, de preferência no almoço do fim de semana. Não é "sair da dieta" — está previsto no plano.</p>
+      <p class="note">Se a semana sair do combinado, retoma na próxima refeição. Não compensa pulando refeição.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ===================== SUPLEMENTOS ===================== -->
+<section id="suplementos">
+  <div class="sec-head"><span class="n">06</span><h2>Suplementos</h2></div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>Suplemento</th><th>Dose</th><th>Quando</th></tr></thead>
+      <tbody>
+        <tr><td>Vitamina D3</td><td>7.000 UI</td><td>Almoço, diário</td></tr>
+        <tr><td>Metilcobalamina (B12)</td><td>1.000 mcg</td><td>Manhã, em jejum</td></tr>
+        <tr><td>Quelato de ferro</td><td>30 mg</td><td>Manhã, com vit. C</td></tr>
+        <tr><td>Magnésio dimalato</td><td>300 mg</td><td>Antes de dormir</td></tr>
+        <tr><td>Ômega 3 (EPA+DHA)</td><td>1.000 mg</td><td>Almoço</td></tr>
+        <tr><td>Whey protein</td><td>1 scoop</td><td>Lanche ou pós-treino</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Por que cada um</h3>
+    <ul class="tick">
+      <li><b>D3 + magnésio:</b> corrigir a deficiência e melhorar sensibilidade à insulina e sono</li>
+      <li><b>B12 + ferro:</b> energia, cabelo e unhas</li>
+      <li><b>Ômega 3:</b> reduzir triglicerídeos e a inflamação da PCR</li>
+      <li><b>Whey:</b> praticidade para bater a proteína do dia</li>
+    </ul>
+    <p class="note">Ferro e magnésio não devem ser tomados no mesmo horário — competem pela absorção.</p>
+  </div>
+</section>
+
+<!-- ===================== CLÍNICA ===================== -->
+<section id="clinica">
+  <div class="sec-head"><span class="n">07</span><h2>Feito na clínica</h2></div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>Data</th><th>Procedimento</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td>15/07</td><td>Bioimpedância</td><td>Basal registrada</td></tr>
+        <tr><td>15/07</td><td>Avaliação antropométrica</td><td>Dobras e circunferências</td></tr>
+        <tr><td>22/07</td><td>Bioimpedância</td><td>Controle de 7 dias</td></tr>
+        <tr><td>22/07</td><td>Orientação de rótulos</td><td>Prática com produtos reais</td></tr>
+        <tr><td>22/07</td><td>Entrega do plano alimentar</td><td>Versão impressa + digital</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Agendado</h3>
+    <div class="kv">
+      <div><span class="k">Retorno</span><span class="v">12/08/2026 · 14h</span></div>
+      <div><span class="k">Bioimpedância</span><span class="v">12/08/2026</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== EVOLUÇÃO ===================== -->
+<section id="evolucao">
+  <div class="sec-head"><span class="n">08</span><h2>Evolução</h2></div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>Data</th><th>Peso</th><th>Gordura</th><th>Massa magra</th><th>Cintura</th></tr></thead>
+      <tbody>
+        <tr><td>15/07</td><td>79,8 kg</td><td>33,1 %</td><td>53,4 kg</td><td>92 cm</td></tr>
+        <tr><td>22/07</td><td>78,4 kg</td><td>32,0 %</td><td>53,3 kg</td><td>90 cm</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Massa magra preservada — o que saiu foi gordura e retenção. É exatamente o objetivo.</p>
+  </div>
+</section>
+
+<!-- ===================== ORIENTAÇÕES ===================== -->
+<section id="orientacoes">
+  <div class="sec-head"><span class="n">09</span><h2>Orientações</h2></div>
+
+  <details open>
+    <summary>Lembretes da semana</summary>
+    <div class="det-body">
+      <ul class="tick">
+        <li>Proteína no café da manhã, sem exceção</li>
+        <li>Lanche das 16 h já separado na noite anterior</li>
+        <li>Garrafa de água sempre à vista na mesa</li>
+        <li>Caminhada de 15 min depois do jantar</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Lista de compras base</summary>
+    <div class="det-body">
+      <ul class="tick">
+        <li><b>Proteínas:</b> ovos, frango, tilápia, carne moída magra, queijo branco</li>
+        <li><b>Carboidratos:</b> arroz, batata-doce, mandioca, pão integral, tapioca</li>
+        <li><b>Frutas:</b> mamão, morango, kiwi, banana, maçã</li>
+        <li><b>Gorduras:</b> azeite, castanhas, pasta de amendoim, abacate</li>
+        <li><b>Extras:</b> iogurte sem lactose, whey, temperos naturais</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Quando me chamar</summary>
+    <div class="det-body">
+      <ul class="tick">
+        <li>Qualquer sintoma novo após iniciar os suplementos</li>
+        <li>Dúvida sobre substituição de alimento</li>
+        <li>Viagem ou evento que mude a rotina</li>
+        <li>Se travar por mais de 3 semanas sem mudança</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <b>Amanda Guerra · Nutricionista</b>
+  CRN 00000 · Portal atualizado em 22/07/2026<br>
+  Conteúdo pessoal e confidencial. Não compartilhe este link.
+</footer>
+
+</main>
+
+<button id="install">Instalar este portal no celular</button>
+
+<script>
+(function(){
+  // ---- manifest gerado em runtime (mantém o arquivo único) ----
+  var icon = "data:image/svg+xml;base64," + btoa(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'>"+
+    "<rect width='512' height='512' rx='112' fill='#3f5544'/>"+
+    "<path d='M256 384c0-112 48-176 128-192-16 96-64 160-128 192z' fill='#c9d8bf'/>"+
+    "<path d='M256 384c-64-32-112-96-128-192 80 16 128 80 128 192z' fill='#e8efe2'/></svg>");
+  var manifest = {
+    name:"Portal · Maria Teste", short_name:"Meu Portal",
+    start_url:".", scope:".", display:"standalone",
+    background_color:"#f7f5f0", theme_color:"#3f5544",
+    icons:[{src:icon,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]
+  };
+  var link = document.createElement("link");
+  link.rel = "manifest";
+  link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/json"}));
+  document.head.appendChild(link);
+
+  // ---- botão de instalar (Android/desktop) ----
+  var btn = document.getElementById("install"), evt = null;
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); evt = e; btn.style.display = "block";
+  });
+  btn.addEventListener("click", function(){
+    if(!evt) return; evt.prompt(); evt = null; btn.style.display = "none";
+  });
+
+  // ---- nav ativa conforme rolagem ----
+  var links = [].slice.call(document.querySelectorAll("nav a"));
+  var secs  = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
+  var nav   = document.querySelector("nav");
+  function sync(){
+    var y = window.scrollY + document.getElementById("hero").offsetHeight + 90, i = 0;
+    secs.forEach(function(s,k){ if(s && s.offsetTop <= y) i = k; });
+    links.forEach(function(a,k){ a.classList.toggle("on", k === i); });
+    var on = links[i];
+    if(on) nav.scrollTo({left: on.offsetLeft - 16, behavior:"smooth"});
+  }
+  window.addEventListener("scroll", sync, {passive:true});
+  sync();
+
+  // ---- altura real do hero -> variável CSS ----
+  function heroH(){
+    document.documentElement.style.setProperty("--hero-h",
+      document.getElementById("hero").offsetHeight + "px");
+  }
+  window.addEventListener("resize", heroH); heroH();
+})();
+</script>
+</body>
+</html>
